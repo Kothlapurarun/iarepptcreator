@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPT Creator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>PPT Creator</h1>
+      <p class="subtitle">Paste your slide content, pick a format, and download your presentation</p>
+    </header>
+
+    <div class="main-layout">
+      <div class="left-panel">
+        <div class="panel text-panel">
+          <label for="slideInput">Slide Content</label>
+          <p class="hint">Enter your slides using the format below. Use <code>Slide N:</code> to start a new slide. Lines starting with <code>-</code> become bullet points.</p>
+          <textarea id="slideInput" placeholder="Slide 1: Introduction&#10;- Welcome to our presentation&#10;- Today we will cover exciting topics&#10;- Let's get started&#10;&#10;Slide 2: Overview&#10;- First point&#10;- Second point&#10;- Third point"></textarea>
+          <div class="text-actions">
+            <button id="loadSample" class="btn btn-secondary">Load Sample</button>
+            <button id="clearText" class="btn btn-secondary">Clear</button>
+          </div>
+        </div>
+
+        <div class="panel format-panel">
+          <label>Presentation Format</label>
+          <p class="hint">Choose a format, upload a <code>PPT</code> template, or upload an <code>image</code> as slide background. You can also drag and drop files here.</p>
+          <div class="format-grid" id="formatGrid">
+            <div class="format-card" data-format="modern">
+              <div class="format-preview modern-preview">
+                <div class="fp-bar"></div>
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+                <div class="fp-line"></div>
+              </div>
+              <span>Modern</span>
+            </div>
+            <div class="format-card" data-format="minimal">
+              <div class="format-preview minimal-preview">
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+              </div>
+              <span>Minimal</span>
+            </div>
+            <div class="format-card" data-format="bold">
+              <div class="format-preview bold-preview">
+                <div class="fp-bg"></div>
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+              </div>
+              <span>Bold</span>
+            </div>
+            <div class="format-card" data-format="corporate">
+              <div class="format-preview corporate-preview">
+                <div class="fp-header"></div>
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+                <div class="fp-footer"></div>
+              </div>
+              <span>Corporate</span>
+            </div>
+            <div class="format-card" data-format="creative">
+              <div class="format-preview creative-preview">
+                <div class="fp-circle"></div>
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+                <div class="fp-line"></div>
+              </div>
+              <span>Creative</span>
+            </div>
+            <div class="format-card" data-format="academic">
+              <div class="format-preview academic-preview">
+                <div class="fp-topbar"></div>
+                <div class="fp-title"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line"></div>
+                <div class="fp-line short"></div>
+              </div>
+              <span>Academic</span>
+            </div>
+            <div class="format-card format-card-upload" data-format="custom" id="uploadCard">
+              <div class="format-preview upload-preview">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="C:\Users\Administrator\Downloads\sampliare.jpg"/>
+                //  <polyline points="17 8 12 3 7 8"/>
+                 // <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <span>Browse PPT</span>
+            </div>
+            <div class="format-card format-card-upload selected" data-format="image" id="imageCard">
+              <div class="format-preview upload-preview">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+              <span>Browse Image</span>
+            </div>
+          </div>
+          <input type="file" id="pptxFileInput" accept=".pptx" style="display:none;">
+          <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none;">
+          <div class="upload-status" id="uploadStatus"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="panel preview-panel">
+          <label>Preview</label>
+          <div class="preview-container" id="previewContainer">
+            <div class="preview-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <p>Your slides will appear here</p>
+            </div>
+          </div>
+          <div class="preview-nav" id="previewNav" style="display:none;">
+            <button id="prevSlide" class="btn btn-icon" disabled>&#9664;</button>
+            <span id="slideCounter">1 / 1</span>
+            <button id="nextSlide" class="btn btn-icon" disabled>&#9654;</button>
+          </div>
+        </div>
+
+        <div class="panel actions-panel">
+          <button id="generateBtn" class="btn btn-primary btn-large">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Generate Presentation
+          </button>
+          <button id="downloadBtn" class="btn btn-success btn-large" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download PPT
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
